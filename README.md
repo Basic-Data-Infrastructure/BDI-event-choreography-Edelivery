@@ -15,3 +15,17 @@ Planned approach:
 ### Notes
 
 For the first experiment, we follow the Domibus [Quick Start Guide v5.1.6](https://docs.edelivery.tech.ec.europa.eu/domibus/5.1.6/#quickstart).
+
+Configure the environment:
+
+    $ cat domibus-msh-distribution-5.1.6-tomcat-full/domibus/bin/setenv.sh 
+    #!/bin/sh
+    export PROJECT_HOME=$HOME/Code/BDI-event-choreography-Edelivery
+    export CATALINA_HOME=$PROJECT_HOME/domibus-msh-distribution-5.1.6-tomcat-full/domibus
+    export JAVA_OPTS="$JAVA_OPTS -Xms128m -Xmx1024m"
+    export JAVA_OPTS="$JAVA_OPTS -Ddomibus.config.location=$PROJECT_HOME/domibus/conf/domibus"
+
+To run with logs:
+
+    $ cd domibus-msh-distribution-5.1.6-tomcat-full/domibus/bin
+    $ ./catalina.sh run
