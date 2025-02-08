@@ -27,7 +27,15 @@ To get the admin passwords:
 
     $ sudo docker compose logs | grep "Default password for user \[admin\] is"
 
-To visit the Administration Console instances:
+To visit the Administration Console instances, use different browser sessions:
 
-- http://localhost:8080/domibus/
-- http://localhost:8081/domibus/
+- http://localhost:8080/domibus/ (blue)
+- http://localhost:8081/domibus/ (red)
+
+For each instance, change the admin password and upload the associated PMode.
+
+Now send a message:
+
+    $ sh submit-hello-world.sh
+
+You can observe the message in the Messages tab of each Administration Console.
