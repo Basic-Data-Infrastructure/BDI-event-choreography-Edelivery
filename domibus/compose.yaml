@@ -1,0 +1,37 @@
+services:
+  web-blue:
+    build:
+      target: blue
+    ports:
+      - "8080:8080"
+    links:
+      - "mysql-blue:mysql"
+  web-red:
+    build:
+      target: red
+    ports:
+      - "8081:8080"
+    links:
+      - "mysql-red:mysql"
+  mysql-blue:
+    image: mysql:8
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_DATABASE: domibus
+      MYSQL_USER: edelivery
+      MYSQL_PASSWORD: edelivery
+    volumes:
+      - type: bind
+        source: ./sql-scripts
+        target: /docker-entrypoint-initdb.d
+  mysql-red:
+    image: mysql:8
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_DATABASE: domibus
+      MYSQL_USER: edelivery
+      MYSQL_PASSWORD: edelivery
+    volumes:
+      - type: bind
+        source: ./sql-scripts
+        target: /docker-entrypoint-initdb.d
