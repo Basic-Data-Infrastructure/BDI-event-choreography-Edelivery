@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:latest AS base
 
 RUN apt update && apt install -y unzip openjdk-21-jre-headless
 
@@ -17,3 +17,9 @@ ENV JAVA_OPTS="-Xms128m -Xmx1024m -Ddomibus.config.location=/etc/domibus"
 
 ENTRYPOINT ["bin/catalina.sh"]
 CMD ["run"]
+
+FROM base AS blue
+RUN echo "domibus.security.key.private.alias=blue_gw" >> /etc/domibus/domibus.properties
+
+FROM base AS red
+RUN echo "domibus.security.key.private.alias=red_gw" >> /etc/domibus/domibus.properties

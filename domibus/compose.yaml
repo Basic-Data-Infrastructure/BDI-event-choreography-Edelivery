@@ -1,12 +1,14 @@
 services:
   web-blue:
-    build: .
+    build:
+      target: blue
     ports:
       - "8080:8080"
     links:
       - "mysql-blue:mysql"
   web-red:
-    build: .
+    build:
+      target: red
     ports:
       - "8081:8080"
     links:
