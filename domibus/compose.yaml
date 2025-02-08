@@ -3,20 +3,12 @@ services:
     build: .
     ports:
       - "8080:8080"
-    volumes:
-      - type: bind
-        source: ./conf/domibus
-        target: /etc/domibus
     links:
       - "mysql-blue:mysql"
   web-red:
     build: .
     ports:
       - "8081:8080"
-    volumes:
-      - type: bind
-        source: ./conf/domibus
-        target: /etc/domibus
     links:
       - "mysql-red:mysql"
   mysql-blue:
