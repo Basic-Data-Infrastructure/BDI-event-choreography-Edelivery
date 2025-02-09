@@ -35,3 +35,7 @@ services:
       - type: bind
         source: ./sql-scripts
         target: /docker-entrypoint-initdb.d
+  tcpdump:
+    build:
+      target: tcpdump
+    network_mode: "container:domibus-web-red-1"
