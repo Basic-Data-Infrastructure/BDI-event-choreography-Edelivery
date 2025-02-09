@@ -23,3 +23,9 @@ RUN echo "domibus.security.key.private.alias=blue_gw" >> /etc/domibus/domibus.pr
 
 FROM base AS red
 RUN echo "domibus.security.key.private.alias=red_gw" >> /etc/domibus/domibus.properties
+
+FROM ubuntu:latest AS tcpdump
+
+RUN apt update && apt install -y tcpdump
+ENTRYPOINT ["/usr/bin/tcpdump"]
+CMD ["-i", "any", "-v", "-N", "-A", "port 8080"]
