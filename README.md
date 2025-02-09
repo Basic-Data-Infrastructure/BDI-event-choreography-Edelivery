@@ -44,9 +44,32 @@ You can observe the message in the Messages tab of each Administration Console. 
 
 ### Example message sequence
 
-These data were generated using the above steps.
+These data were generated using the above steps. For context, recall that e-delivery works in a four-corner model:
 
-Request:
+```
+Corner 1:         Corner 4:
+Agent A           Agent B
+   |                  ^
+   |                  |
+   v                  |
+Corner 2:  -----> Corner 3:
+Provider A        Provider B
+```
+
+For sending a message, e-delivery only standardises the interaction between Corner 2 and Corner 3. Domibus implements the AS4 profile, which works as follows:
+
+```mermaid
+sequenceDiagram
+    participant c2 as Corner 2
+    participant c3 as Corner 3
+    autonumber
+    c2->>+c3: POST /domibus/services/msh HTTP/1.1
+    c3-->>-c2: HTTP/1.1 200
+```
+
+#### Message 1: SOAP envelope with ebMS user message
+
+HTTP request:
 
 ```
 POST /domibus/services/msh HTTP/1.1
@@ -190,10 +213,12 @@ Request SOAP envelope, with XML reformatted:
 </env:Envelope>
 ```
 
-Response:
+#### Message 2: SOAP envelope with ebMS signal message
+
+HTTP response:
 
 ```
-HTTP/1.1 200 
+HTTP/1.1 200
 Content-Type: application/soap+xml;charset=UTF-8
 Content-Length: 5130
 Date: Sun, 09 Feb 2025 09:09:41 GMT
