@@ -39,3 +39,5 @@ services:
     build:
       target: tcpdump
     network_mode: "container:domibus-web-red-1"
+    depends_on:
+      - web-red
