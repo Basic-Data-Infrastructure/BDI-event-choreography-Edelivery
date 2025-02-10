@@ -21,8 +21,6 @@ To run the Docker containers:
     $ cd domibus
     $ sudo docker compose up
 
-You may need to try that twice.
-
 To get the admin passwords:
 
     $ sudo docker compose logs | grep "Default password for user \[admin\] is"
