@@ -32,6 +32,7 @@ CMD ["-i", "any", "-v", "-N", "-A", "port 8080"]
 
 FROM ubuntu:latest AS config
 RUN apt update && apt install -y curl
+WORKDIR /opt/config
 ADD conf/pmodes .
 ADD configure.sh .
 CMD sh configure.sh
