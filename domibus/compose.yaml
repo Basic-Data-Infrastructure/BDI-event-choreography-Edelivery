@@ -6,6 +6,14 @@ services:
       - "8080:8080"
     links:
       - "mysql-blue:mysql"
+    depends_on:
+      mysql-blue:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail-with-body", "-H", "Authorization: Basic cGFkbWluOnBhc3N3b3Jk", "http://localhost:8080/domibus/ext/monitoring/application/status"]
+      timeout: 5s
+      retries: 100
+      start_period: 10s
   web-red:
     build:
       target: red
@@ -13,6 +21,14 @@ services:
       - "8081:8080"
     links:
       - "mysql-red:mysql"
+    depends_on:
+      mysql-red:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail-with-body", "-H", "Authorization: Basic cGFkbWluOnBhc3N3b3Jk", "http://localhost:8080/domibus/ext/monitoring/application/status"]
+      timeout: 5s
+      retries: 100
+      start_period: 10s
   mysql-blue:
     image: mysql:8
     environment:
@@ -24,6 +40,11 @@ services:
       - type: bind
         source: ./sql-scripts
         target: /docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 100
+      start_period: 10s
   mysql-red:
     image: mysql:8
     environment:
@@ -35,7 +56,20 @@ services:
       - type: bind
         source: ./sql-scripts
         target: /docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 100
+      start_period: 10s
   tcpdump:
     build:
       target: tcpdump
     network_mode: "container:domibus-web-red-1"
+    depends_on:
+      - web-red
+  config:
+    build:
+      target: config
+    depends_on:
+      web-blue:
+        condition: service_healthy

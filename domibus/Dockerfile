@@ -1,6 +1,6 @@
 FROM ubuntu:latest AS base
 
-RUN apt update && apt install -y unzip openjdk-21-jre-headless
+RUN apt update && apt install -y curl unzip openjdk-21-jre-headless
 
 ADD https://ec.europa.eu/digital-building-blocks/artifact/repository/eDelivery/eu/domibus/domibus-msh-distribution/5.1.6/domibus-msh-distribution-5.1.6-tomcat-full.zip /tmp/download/domibus.zip
 RUN unzip -d /tmp/download /tmp/download/domibus.zip
@@ -29,3 +29,10 @@ FROM ubuntu:latest AS tcpdump
 RUN apt update && apt install -y tcpdump
 ENTRYPOINT ["/usr/bin/tcpdump"]
 CMD ["-i", "any", "-v", "-N", "-A", "port 8080"]
+
+FROM ubuntu:latest AS config
+RUN apt update && apt install -y curl
+WORKDIR /opt/config
+ADD conf/pmodes .
+ADD configure.sh .
+CMD sh configure.sh
