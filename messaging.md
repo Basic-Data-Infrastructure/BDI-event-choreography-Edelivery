@@ -320,3 +320,113 @@ The structure is similar to the one in the request:
   <S12:Body wsu:Id="N65667"/>
 </S12:Envelope>
 ```
+
+## Comparison
+
+Any messaging protocol will have some overhead over the original `{"hello":"world"}` payload. This section compares the overhead in e-delivery with the overhead in alternative approaches.
+
+### Alternative approaches
+
+#### Approach 1: event broker
+
+In the [Trusted Good Release – Event Demo](https://bdi.gitbook.io/public/reference-architecture/logistics-event-kit/trusted-goods-release-event-demo) (Phase 3), BDI has experimented with the [Apache Pulsar](https://pulsar.apache.org/) messaging and streaming platform as an event broker. See [Pulsar DNS VGU v0.9](https://github.com/Basic-Data-Infrastructure/BDI-Reference-Architecture/blob/main/.gitbook/assets/20240701_DIL_BDI%20SAD%20DNS%20Pulsar%20VGU%200.9.pdf) for the software architecture document.
+
+With a single event broker, there are no Corners 2 and 3. Instead, for interoperability we need to consider the complete exchange between the producer of the event and subscriber to the relevant topic. Using the [Pulsar WebSocket API](https://pulsar.apache.org/docs/4.0.x/client-libraries-websocket/), omitting the [WebSockets](https://websockets.spec.whatwg.org/) handshake and control messages:
+
+```
+sequenceDiagram
+    actor pub as Producer
+    participant broker as Event broker
+    actor sub as Subscriber
+    autonumber
+    sub->>broker: GET -%<- topic URL -%<-/sub01 HTTP/1.1
+    pub->>+broker: GET -%<- topic URL -%<- HTTP/1.1
+    pub->>+broker: Message to publish
+    broker-->>-pub: Success response
+    broker--)sub: Push message
+```
+
+##### Messages 1 and 2: Connection setup
+
+The publisher and subscriber need to connect to the event broker, providing an access token and identifying the delegating party. The topic URL contains the topic owner’s EORI and the topic name, which we assume is the transport order identifier as per [Bevindingen DIL VGU Demo Fase 3](https://github.com/Basic-Data-Infrastructure/BDI-Reference-Architecture/blob/main/.gitbook/assets/20241002_DIL-VGU-bevindingen-fase-3.pdf). In addition, the subscriber needs to identify its subscription in the URL.
+
+```
+GET /ws/v2/consumer/persistent/public/EU.EORI.SMARTPHON/order987/sub01 HTTP/1.1
+Host: pulsar.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Version: 13
+Authorization: Bearer dylBqb0ZXehqJ3g+SfrnXQ==
+Delegation-Trail: NL1234567890
+```
+
+Note that the use of namespaces and topic names reflects the use of message partition channels in e-delivery. The use of collaboration info in e-delivery may be mapped to this as well.
+
+##### Message 3: Message to publish
+
+The publisher sends the following message to the broker, to enable all subscribers to the topic to consume it. With the base64-encoded payload decoded:
+
+```
+{
+  "payload": base64({ "hello": "world" })
+}
+```
+
+##### Message 4: Success response
+
+The broker returns to the publisher a confirmation.
+
+```
+{
+  "result": "ok",
+  "messageId": "CAAQAw==",
+  "context": "1"
+}
+```
+
+This response could be considered similar to the e-delivery signal message. No non-repudiation information is needed since there is a single trusted broker.
+
+##### Message 5: Push message
+
+Subscribers receive a push message over the WebSockets channel.
+
+```
+{
+  "messageId": "CAAQAw==",
+  "payload": "hvXcJvHW7kOSrUn17P2q71RA5SdiXwZBqw==",
+  "publishTime": "2021-10-29T16:01:38.967-07:00",
+  "redeliveryCount": 0,
+  "encryptionContext": {
+    "keys": {
+      "client-rsa.pem": {
+        "keyValue": "jEuwS+PeUzmCo7IfLNxqoj4h7txbLjCQjkwpaw5AWJfZ2xoIdMkOuWDkOsqgFmWwxiecakS6GOZHs94x3sxzKHQx9Oe1jpwBg2e7L4fd26pp+WmAiLm/ArZJo6JotTeFSvKO3u/yQtGTZojDDQxiqFOQ1ZbMdtMZA8DpSMuq+Zx7PqLo43UdW1+krjQfE5WD+y+qE3LJQfwyVDnXxoRtqWLpVsAROlN2LxaMbaftv5HckoejJoB4xpf/dPOUqhnRstwQHf6klKT5iNhjsY4usACt78uILT0pEPd14h8wEBidBz/vAlC/zVMEqiDVzgNS7dqEYS4iHbf7cnWVCn3Hxw==",
+      }
+    },
+    "param": "Tfu1PxVm6S9D3+Hk",
+    "compressionType": "NONE"
+  }
+}
+```
+
+We see several e-delivery patterns applied. There is the concept of redelivery, which matches AS4 Reception Awareness, an optional feature that is not demonstrated here. There is the encrypted key and the implicit encrypted data definition: also here, the payload’s AES encryption key is encrypted in the recipient’s RSA public key. Finally, there is the concept of compression which is not applied here.
+
+#### Alternative approach 2: webhooks
+
+TODO
+
+### Overhead in e-delivery
+
+When comparing the approaches, the e-delivery protocol contains additional metadata that may be redundant.
+
+#### Original sender and final recipient identification
+
+TODO
+
+#### Provider identification
+
+TODO
+
+#### XML syntax
+
+TODO
