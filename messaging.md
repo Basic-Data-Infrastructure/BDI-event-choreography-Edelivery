@@ -427,6 +427,10 @@ TODO
 
 TODO
 
+#### Provider signatures
+
+TODO
+
 #### XML syntax
 
 TODO
