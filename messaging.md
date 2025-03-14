@@ -333,7 +333,7 @@ In the [Trusted Good Release – Event Demo](https://bdi.gitbook.io/public/refer
 
 With a single event broker, there are no Corners 2 and 3. Instead, for interoperability we need to consider the complete exchange between the producer of the event and subscriber to the relevant topic. Using the [Pulsar WebSocket API](https://pulsar.apache.org/docs/4.0.x/client-libraries-websocket/), omitting the [WebSockets](https://websockets.spec.whatwg.org/) handshake and control messages:
 
-```
+```mermaid
 sequenceDiagram
     actor pub as Producer
     participant broker as Event broker
