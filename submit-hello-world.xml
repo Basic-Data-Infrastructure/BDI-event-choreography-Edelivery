@@ -23,7 +23,7 @@
             <ns:PayloadInfo>
                <ns:PartInfo href="cid:message">
                   <ns:PartProperties>
-                     <ns:Property name="MimeType">text/xml</ns:Property>
+                     <ns:Property name="MimeType">application/json</ns:Property>
                   </ns:PartProperties>
                </ns:PartInfo>
             </ns:PayloadInfo>
@@ -33,8 +33,8 @@
    </soap:Header>
    <soap:Body>
       <eu:submitRequest>
-         <payload payloadId="cid:message" contentType="text/xml">
-         	<value>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPGhlbGxvPndvcmxkPC9oZWxsbz4=</value>
+         <payload payloadId="cid:message" contentType="application/json">
+         	<value>eyJoZWxsbyI6IndvcmxkIn0K</value>
          </payload>
       </eu:submitRequest>
    </soap:Body>
