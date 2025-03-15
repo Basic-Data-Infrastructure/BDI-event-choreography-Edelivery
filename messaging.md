@@ -346,12 +346,12 @@ sequenceDiagram
     broker--)sub: Push message
 ```
 
-##### Messages 1 and 2: Connection setup
+##### Messages 1 and 2: connection setup
 
 The publisher and subscriber need to connect to the event broker, providing an access token and identifying the delegating party. The topic URL contains the topic owner’s EORI and the topic name, which we assume is the transport order identifier as per [Bevindingen DIL VGU Demo Fase 3](https://github.com/Basic-Data-Infrastructure/BDI-Reference-Architecture/blob/main/.gitbook/assets/20241002_DIL-VGU-bevindingen-fase-3.pdf). In addition, the subscriber needs to identify its subscription in the URL.
 
 ```
-GET /ws/v2/consumer/persistent/public/EU.EORI.SMARTPHON/order987/sub01 HTTP/1.1
+GET /ws/v2/consumer/persistent/public/EU.EORI.NLRTMEMX/order987/sub01 HTTP/1.1
 Host: pulsar.example.com
 Upgrade: websocket
 Connection: Upgrade
@@ -363,7 +363,7 @@ Delegation-Trail: NL1234567890
 
 Note that the use of namespaces and topic names reflects the use of message partition channels in e-delivery. The use of collaboration info in e-delivery may be mapped to this as well.
 
-##### Message 3: Message to publish
+##### Message 3: message to publish
 
 The publisher sends the following message to the broker, to enable all subscribers to the topic to consume it. With the base64-encoded payload decoded:
 
@@ -373,7 +373,7 @@ The publisher sends the following message to the broker, to enable all subscribe
 }
 ```
 
-##### Message 4: Success response
+##### Message 4: success response
 
 The broker returns to the publisher a confirmation.
 
@@ -387,7 +387,7 @@ The broker returns to the publisher a confirmation.
 
 This response could be considered similar to the e-delivery signal message. No non-repudiation information is needed since there is a single trusted broker.
 
-##### Message 5: Push message
+##### Message 5: push message
 
 Subscribers receive a push message over the WebSockets channel.
 
@@ -413,24 +413,82 @@ We see several e-delivery patterns applied. There is the concept of redelivery, 
 
 #### Alternative approach 2: webhooks
 
-TODO
+In the [Trusted Good Release – LL68 – DCSA Webhook Events](https://github.com/Basic-Data-Infrastructure/demo-vertrouwde-goederenafgifte/blob/4bf6835859c249055e54b10faaefd2ca99837b23/doc/ll68-rapport.md), BDI has experimented with using webhooks based on an earlier exploration of “static networks using webhooks”. Also see [Deploying an e-delivery access point – Comparison](deploying.md#comparison) for a comparison of the deployment characteristics.
+
+In this illustration we assume that the websockets endpoints are already registered and provided as a service, in a four-corner model:
+
+```mermaid
+sequenceDiagram
+    participant c2 as Corner 2
+    participant c3 as Corner 3
+    autonumber
+    c2->>+c3: POST /erp/event/-%< registered webhook secret -%<- HTTP/1.1
+    c3-->>-c2: HTTP/1.1 202 Accepted
+```
+
+##### Message 1: event submission
+
+The message is submitted with pre-agreed API keys as credentials, which may eventually get replaced by credentials that can be verified within a trust framework.
+
+```
+POST /erp/event/pXY7Uwbd2KBtohp_09q7K_yMFLgS9o1FNKInzCFwLdM HTTP/1.1
+Host: webhook-server.example.com
+User-Agent: MyWebClient/2.1.3 (Unix)
+Content-Type: application/json;charset=UTF-8
+
+{
+  "metadata": {
+    "eventID": "0010fad5-bc6f-4e23-a8da-af935811de2c",
+    "eventCreatedDateTime": "2025-03-25T09:46:11+00:00",
+    "publisher": {
+      "partyName": "ECT EUROMAX TERMINAL (EMX)",
+      "partyCode": "NLRTMEMX",
+      "partyCodeListProvider": "SMDG"
+    },
+    "publisherRole": "TR",
+    "eventType": "TEST"
+  },
+  "payload": { "hello": "world" }
+}
+```
+
+Note that the publisher in this case identifies Corner 1 using a party ID. Corner 2 is identified implicitly using the provided credential. Corner 3 is identified by the endpoint URL, which is assumed to belong to a single Corner 4 party.
+
+##### Message 2: acceptance
+
+Typically webhook endpoints only return a successfull status code `2xx`, without any further information. The request handler should not perform any logic that could cause a timeout. Such best practices are not standardized, but recorded in for example the developer documentation [Receive Stripe events in your webhook endpoint](https://docs.stripe.com/webhooks#acknowledge-events-immediately).
+
+```
+HTTP/1.1 202 Accepted 
+Date: Tue, 15 Mar 2025 09:46:12 GMT
+Server: MyWebServer/1.2.3 (Unix)
+Content-Length: 0
+```
+
+If the event producer would need some explicit (potentially non-repudiable) confirmation, this “signal message” could be designed as a reverse webhook call with another event, referring to the event ID and potentially its content. Alternatively, the empty response may be signed with a reference to the request data using for example HTTP message signatures ([RFC 9421](https://www.rfc-editor.org/rfc/rfc9421)). Either way, this would need further standardisation for interoperability.
 
 ### Overhead in e-delivery
 
 When comparing the approaches, the e-delivery protocol contains additional metadata that may be redundant.
 
-#### Original sender and final recipient identification
+#### Identification of all four corners
 
-TODO
+In e-delivery, typically all four corners are identified: the original sender, the current sender, the current recipient, and the final recipient. In other approaches some of these may be left implicit. In HTTP-based approaches, it is common to identify the `User-Agent` and `Server` software for compatibility purposes, but not the parties hosting them.
 
-#### Provider identification
+Arguably, identifying all four corners is only necessary if these all provide a meaningful role, for example taking accountability for identification and authentication or for audit logging. In the case of self-hosting, the original sender and/or the final recipient would equal Corner 2 respectively 3, and either be included as such or be omitted in a more lightweight AS4 profile.
 
-TODO
+Comparing with the webhook example, the namespaced identifiers in e-delivery do not seem to be significantly more heavyweight, especially if interoperability more naming schemes than EORI is expected.
 
 #### Provider signatures
 
-TODO
+In e-delivery, typically providers add non-repudiable signatures to both user and signal messages, which enables their agents to trust statements from each other’s providers without having a direct connection to them. As explored in [Unifying HTTP security with message security](deployment.md#unifying-http-security-with-message-security), these could be omitted if the providers are not accountable for identification, authentication and monitoring.
 
-#### XML syntax
+The provider signature format is XML Signatures. While this contains more boilerplate than for example JSON Web Signatures (JWS), both are an equivalent best practice for advanced e-signatures (AdES) under eIDAS. The security considerations for implementation are well known. Compressed HTTP content encoding could reduce the overhead if needed.
 
-TODO
+#### Verbose XML syntax
+
+The SOAP messages in e-delivery are more verbose than the messages in alternative formats. This has multiple aspects to it.
+
+One aspect is that e-delivery is composed of multiple standards. These bring their own namespaces. The advantage of this modularity is that each standard brings a clear bounded context for understanding its related domain, and typically has high-quality open source libraries available. In e-delivery this is explicit in the XML namespaces and wrapper objects, while in the JSON alternatives this typically requires manual dissection, processing and composition of primitively-typed data elements. This could be easier on developers who prefer working from concrete examples instead of specified frameworks. For this audience, an e-delivery toolkit for BDI might include such concrete examples as well, and specify JSON-based APIs for Corners 1 and 2.
+
+Another aspect is that e-delivery is based on a markup language, XML, which is designed for mixing plain text with structured data. This can make it more difficult to look at its messages, with the closing tags and the often arbitrary distinction between attributes and child elements. It can also make message processing code more verbose. Developer tooling can be used to reduce this overhead.
