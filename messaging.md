@@ -469,7 +469,7 @@ If the event producer would need some explicit (potentially non-repudiable) conf
 
 ### Overhead in e-delivery
 
-When comparing the approaches, the e-delivery protocol contains additional metadata that may be redundant.
+When comparing the approaches, the e-delivery protocol contains additional metadata that may be redundant. Note that since e-delivery events are bound to logistics events, the overhead is not expected to cause issues in lead time. The main concern is the experience in standardisation and development.
 
 #### Identification of all four corners
 
@@ -477,7 +477,7 @@ In e-delivery, typically all four corners are identified: the original sender, t
 
 Arguably, identifying all four corners is only necessary if these all provide a meaningful role, for example taking accountability for identification and authentication or for audit logging. In the case of self-hosting, the original sender and/or the final recipient would equal Corner 2 respectively 3, and either be included as such or be omitted in a more lightweight AS4 profile.
 
-Comparing with the webhook example, the namespaced identifiers in e-delivery do not seem to be significantly more heavyweight, especially if interoperability more naming schemes than EORI is expected.
+Comparing with the webhook example, the namespaced identifiers in e-delivery do not seem to be significantly more heavyweight, especially if interoperability with more naming schemes than EORI is expected.
 
 #### Provider signatures
 
