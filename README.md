@@ -54,3 +54,7 @@ Through configuring, demonstrating and analysing a “hello world” exchange us
 - Syntactical messaging overhead is higher in e-delivery than in typical HTTP/JSON systems, which is at least partly caused due to the reuse of standardized XML building blocks.
 
 The evidence so far supports H0. This means that e-delivery could be deployed in a lightweight system, similarly to the previous BDI experiments.
+
+## Reflection
+
+See [Reflection and recommendations](reflection.md).
