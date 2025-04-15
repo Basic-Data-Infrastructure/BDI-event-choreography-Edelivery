@@ -9,7 +9,7 @@ What existing standards, frameworks and developments could BDI leverage to evolv
 BDI could choose to leverage the Digital Europe **e-delivery** ([eDelivery](https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/eDelivery)) building block, as standardised under e.g. the once-only technical system, Peppol and eIDAS. Adopting e-delivery could bring several benefits, including:
 
 - ability for BDI participants to reuse the same infrastructure for other data spaces, such as for e-invoicing;
-- ability to build upon and further develop open source building blocks that are already commonly used;
+- ability to build upon and further develop open source building blocks that are already commonly used, solving well-known issues such as exchange across firewalls;
 - lower cost of securing and maintaining custom protocols that could be developed instead;
 - cross-sector collaboration on information exchange, e.g. through Trusted Information Partners (TIP) which similarly has a [Basic function *Delivering messages* for consultation](https://www.trustedinformationpartners.nl/basisfunctie-delivering-messages-ter-consultatie/).
 
@@ -42,3 +42,15 @@ This repository captures test definitions, results and analysis to assess the st
 - [x] Send a “hello world” message from one deployment of a common open source e-delivery to another deployment; compare steps to steps of deploying a custom web-based integration without e-delivery. See: [Deploying an e-delivery access point](deployment.md).
 - [x] Visualise in sequence diagrams and example messages the protocol steps for this “hello world” message; compare overhead with that of a custom web-based integration without e-delivery. See: [Messaging protocol in e-delivery](messaging.md).
 - [x] Reflect on needed additional steps to make it applicable for e.g. BDI virtual data networks. See: [Issues](https://github.com/Basic-Data-Infrastructure/BDI-event-choreography-Edelivery/issues).
+
+### Conclusion
+
+Through configuring, demonstrating and analysing a “hello world” exchange using an open source e-delivery solution, we have observed:
+
+- Deployment considerations for e-delivery are similar to those of any other web application for information exchange, but documentation so far seems to be less developer-oriented.
+	- If needed, e-delivery security can be slimmed down by solely relying on HTTPS security.
+	- If needed, e-delivery providers can be shared, for example by a principal with subcontractors, or even across principals.
+- Semantic messaging overhead is similar to that in a common event broker or webhooks system, but with more standardisation and therefore higher expectations of interoperability.
+- Syntactical messaging overhead is higher in e-delivery than in typical HTTP/JSON systems, which is at least partly caused due to the reuse of standardized XML building blocks.
+
+The evidence so far supports H0. This means that e-delivery could be deployed in a lightweight system, similarly to the previous BDI experiments.
