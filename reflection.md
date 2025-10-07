@@ -21,7 +21,7 @@ Adoption of e-delivery impacts several of the BDI KITs. The impact can be handle
 - [ ] Specify an event data model based on for example [EPCIS](https://www.iso.org/standard/85557.html) for in terms of e-delivery *user messages*, to provide interoperability for (logistics) events.
 - [ ] Specify a party identifier scheme based on for example [EORI](https://taxation-customs.ec.europa.eu/customs-4/customs-procedures-import-and-export/customs-procedures/economic-operators-registration-and-identification-number-eori_en) in terms of [eDelivery ebCore Party ID](https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/eDelivery+ebCore+Party+ID), to provide interoperability for identifying C1 and C4.
 - [ ] Specify common patterns for [Event choreography](https://bdi.gitbook.io/public/reference-architecture/logistics-event-kit/event-choreography) in terms of e-delivery processing modes, to provide interoperability for (logistics) event distribution.
- -[ ] Specify data models for managing and using an Association Register under [Federation of Associations](https://bdi.gitbook.io/public/reference-architecture/federation-kit/federation-of-associations) in terms of e-delivery user messages and processing modes, to provide interoperability amongst associations.
+- [ ] Specify data models for managing and using an Association Register under [Federation of Associations](https://bdi.gitbook.io/public/reference-architecture/federation-kit/federation-of-associations) in terms of e-delivery user messages and processing modes, to provide interoperability amongst associations.
 
 ## Improve developer experience
 
